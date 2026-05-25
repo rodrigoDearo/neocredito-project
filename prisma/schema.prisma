@@ -1,0 +1,43 @@
+generator client { provider = "prisma-client-js" }
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Perfil { CORBAN  OPERADOR }
+enum Status { RASCUNHO  EM_ANALISE  APROVADA  REPROVADA  CANCELADA }
+
+model Usuario {
+  id           String     @id @default(uuid()) @db.Uuid
+  email        String     @unique
+  senha        String
+  perfil       Perfil
+  corbanId     String?    @db.Uuid
+  propostas    Proposta[]
+  criadoEm     DateTime   @default(now())
+  atualizadoEm DateTime   @updatedAt
+  @@map("usuarios")
+}
+
+model Proposta {
+  id               String   @id @default(uuid()) @db.Uuid
+  clienteNome      String
+  clienteCpf       String
+  clienteRenda     Decimal  @db.Decimal(15, 2)
+  valorSolicitado  Decimal  @db.Decimal(15, 2)
+  numeroParcelas   Int
+  taxaJuros        Decimal  @db.Decimal(6, 4)
+  valorParcela     Decimal  @db.Decimal(15, 2)
+  totalAPagar      Decimal  @db.Decimal(15, 2)
+  status           Status   @default(RASCUNHO)
+  motivoReprovacao String?
+  corbanId         String   @db.Uuid
+  corban           Usuario  @relation(fields: [corbanId], references: [id])
+  criadoEm        DateTime @default(now())
+  atualizadoEm    DateTime @updatedAt
+  @@index([clienteCpf])
+  @@index([status])
+  @@index([corbanId])
+  @@map("propostas")
+}
