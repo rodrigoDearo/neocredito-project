@@ -1,10 +1,11 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
 FROM base AS development
 COPY . .
+RUN apt-get update && apt-get install -y openssl
 RUN npx prisma generate
 EXPOSE 3000
 

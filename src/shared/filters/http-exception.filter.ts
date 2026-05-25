@@ -27,6 +27,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       this.logger.error(`[${req.method}] ${req.url}`, (exception as Error)?.stack);
     }
 
-    res.status(status).json({ error, ...(details && { details }), path: req.url });
+    res.status(status).json({
+      error,
+      ...(details ? { details } : {}),
+      path: req.url,
+    });
   }
 }
